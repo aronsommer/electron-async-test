@@ -2,13 +2,33 @@
 const { app, BrowserWindow } = require('electron')
 const path = require('path')
 
+// Running in development or production mode?
+var productionMode = true;
+// If launched with --dev flag switch do development mode
+// Flag is set in start script in package.json
+if (process.argv[2] == '--dev') {
+  console.log("Running in development mode");
+  productionMode = false;
+}
+var rootFolder = "path to root folder";
+if (productionMode == true) {
+  rootFolder = process.resourcesPath;
+} else {
+  rootFolder = __dirname;
+}
+
+let mainWindow;
+
 function createWindow() {
   // Create the browser window.
-  const mainWindow = new BrowserWindow({
+  mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
     webPreferences: {
-      preload: path.join(__dirname, 'preload.js')
+      preload: path.join(__dirname, 'preload.js'),
+      nodeIntegration: true,
+      contextIsolation: false,
+      enableRemoteModule: true,
     }
   })
 
@@ -37,11 +57,26 @@ function createWindow() {
       label: 'File',
       submenu: [
         {
-          label: 'Show Current Settings', click() {
-            showDialogWithSettings();
+          label: 'Run main function', click() {
+            main();
           }
         },
         isMac ? { role: 'close' } : { role: 'quit' }
+      ]
+    },
+    // { role: 'viewMenu' }
+    {
+      label: 'View',
+      submenu: [
+        { role: 'reload' },
+        { role: 'forceReload' },
+        { role: 'toggleDevTools' },
+        { type: 'separator' },
+        { role: 'resetZoom' },
+        { role: 'zoomIn' },
+        { role: 'zoomOut' },
+        { type: 'separator' },
+        { role: 'togglefullscreen' },
       ]
     },
   ]
@@ -50,9 +85,9 @@ function createWindow() {
   /////////////////////////////////////////////////////////////////////
   // MENU END
 
-
   // and load the index.html of the app.
-  mainWindow.loadFile('index.html')
+  // mainWindow.loadFile('index.html')
+  mainWindow.loadURL(`file:///${rootFolder}/output.html`)
 
   // Open the DevTools.
   // mainWindow.webContents.openDevTools()
@@ -80,3 +115,11 @@ app.on('window-all-closed', function () {
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
+
+/////////////////////////////////////////////////////////////////////
+// FUNCTIONS
+/////////////////////////////////////////////////////////////////////
+
+async function main() {
+  mainWindow.webContents.send('ping', 'whoooooooh!')
+}
