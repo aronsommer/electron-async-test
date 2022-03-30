@@ -1,0 +1,7 @@
+#!/bin/bash
+
+echo "Start of bash script test1"
+echo "This is an error" >&2
+echo "Sleep now for 3 seconds"
+sleep 3
+echo "Finished sleeping"

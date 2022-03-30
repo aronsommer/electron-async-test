@@ -1,0 +1,4 @@
+#!/bin/bash
+
+echo "Start of bash script test3"
+echo "Finish of bash script test3"
