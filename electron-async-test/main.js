@@ -1,8 +1,8 @@
 // Modules to control application life and create native browser window
-const {app, BrowserWindow} = require('electron')
+const { app, BrowserWindow } = require('electron')
 const path = require('path')
 
-function createWindow () {
+function createWindow() {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
     width: 800,
@@ -11,6 +11,45 @@ function createWindow () {
       preload: path.join(__dirname, 'preload.js')
     }
   })
+
+  // MENU BEGIN
+  /////////////////////////////////////////////////////////////////////
+  const { app, Menu } = require('electron')
+  const isMac = process.platform === 'darwin'
+  const template = [
+    // { role: 'appMenu' }
+    ...(isMac ? [{
+      label: app.name,
+      submenu: [
+        { role: 'about' },
+        { type: 'separator' },
+        { role: 'services' },
+        { type: 'separator' },
+        { role: 'hide' },
+        { role: 'hideOthers' },
+        { role: 'unhide' },
+        { type: 'separator' },
+        { role: 'quit' }
+      ]
+    }] : []),
+    // { role: 'fileMenu' }
+    {
+      label: 'File',
+      submenu: [
+        {
+          label: 'Show Current Settings', click() {
+            showDialogWithSettings();
+          }
+        },
+        isMac ? { role: 'close' } : { role: 'quit' }
+      ]
+    },
+  ]
+  const menu = Menu.buildFromTemplate(template)
+  Menu.setApplicationMenu(menu)
+  /////////////////////////////////////////////////////////////////////
+  // MENU END
+
 
   // and load the index.html of the app.
   mainWindow.loadFile('index.html')
