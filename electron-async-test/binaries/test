@@ -1,0 +1,13 @@
+#!/bin/bash
+
+echo "#dialog!:-)This is an error" >&2
+
+echo "Hello from test"
+echo "\$1 is now $1"
+echo "\$2 is now $2"
+echo "\$3 is now $3"
+
+#cd "jbjcbdjbc" || { echo "cd to 'jbjcbdjbc' failed!"; exit 1; }
+
+echo "#dialog!:-)This is another error" >&2 && exit 1
+echo "This gets never printed"
