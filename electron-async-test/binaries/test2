@@ -1,9 +1,14 @@
 #!/bin/bash
 
 echo "Start of bash script test2"
+
+echo "\$1 is now $1"
+echo "\$2 is now $2"
+echo "\$3 is now $3"
+
 echo "This is an error" >&2
+
 echo "Sleep now for 3 seconds"
 sleep 3
 echo "Finished sleeping"
-echo "Exit now with error code 1"
-exit 1
+echo "There was an error! Exit now with code 1" >&2 && exit 1

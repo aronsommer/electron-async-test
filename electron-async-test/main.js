@@ -129,77 +129,46 @@ console.log = (...args) => {
 
 // main function
 async function main() {
-  // f
-  console.log('Call function f from main function')
-  await f();
-  // f2
-  console.log('Call function f2 from main function')
-  await f2();
-  // when f2 is done
-  console.log('This is called when function f2 is done')
+  // test 1
+  await callBashScript("binaries/test1", ["argument1", "argument2", "argument3"]);
+  // test 2
+  await callBashScript("binaries/test2", ["argument1"]);
+  // after test 2
+  console.log('This gets called after test 2')
   // sync function
   syncFunction();
-  // f3
-  await f3();
+  // test 3
+  await callBashScript("binaries/test3", [""]);
 }
 
-// function f
-async function f() {
-  console.log('Start of function f')
+// Call bash script function
+async function callBashScript(scriptPath, arguments) {
+  console.log('Start of function ' + scriptPath)
 
   let promise = new Promise((resolve, reject) => {
-    const testAction1 = require("child_process").execFile(`${rootFolder}/binaries/test1`, ["argument1"]);
-    // testAction1.stdout.pipe(process.stdout)
-    // testAction1.stderr.pipe(process.stderr)
-    testAction1.stdout.on('data', (data) => {
+    const action = require("child_process").execFile(`${rootFolder}/${scriptPath}`, [...arguments]);
+    // action.stdout.pipe(process.stdout)
+    // action.stderr.pipe(process.stderr)
+    action.stdout.on('data', (data) => {
       data = data.toString();
       console.log(data);
     });
-    testAction1.stderr.on('data', (data) => {
+    action.stderr.on('data', (data) => {
       data = data.toString();
       // console.log(data);
       console.log(`<span style="color:red">${data}</span>`)
     });
-    testAction1.on("exit", () => resolve("bash script test1 done!"))
-  });
-
-  let result = await promise; // wait until the promise resolves (*)
-  console.log(result);
-}
-
-// function f2
-async function f2() {
-  console.log('Start of function f2')
-
-  let promise = new Promise((resolve, reject) => {
-    const testAction1 = require("child_process").execFile(`${rootFolder}/binaries/test2`, ["argument1"]);
-    testAction1.on("exit", (code) => {
+    action.on("exit", (code) => {
       if (code == 0) {
-        console.log("There was no error in bash script test2");
-        resolve("bash script test2 done!")
+        console.log('There was no error in bash script ' + scriptPath)
+        resolve('Bash script ' + scriptPath + ' done!')
       }
       if (code == 1) {
-        console.log("There was an error in bash script test2");
-        resolve("bash script test2 finished with error code 1")
-        // reject("bash script test2 finished with error code 1")
-        // When using reject everything after
-        // await f2(); in main function gets never called        
+        console.log('There was an error in bash script ' + scriptPath)
+        resolve('Bash script ' + scriptPath + ' finished with error code 1')
+        // reject('Bash script ' + scriptPath + ' finished with error code 1')
+        // When using reject everything after the function call in main function gets not executed
       }
-    });
-  });
-
-  let result = await promise; // wait until the promise resolves (*)
-  console.log(result);
-}
-
-// function f3
-async function f3() {
-  console.log('Start of function f3')
-
-  let promise = new Promise((resolve, reject) => {
-    const testAction1 = require("child_process").execFile(`${rootFolder}/binaries/test3`, ["argument1"]);
-    testAction1.on("exit", (code) => {
-      resolve("bash script test3 finished")
     });
   });
 
@@ -208,6 +177,6 @@ async function f3() {
 }
 
 // sync function
-function syncFunction(){
+function syncFunction() {
   console.log('do stuff in sync function')
 }
